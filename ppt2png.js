@@ -12,23 +12,33 @@ var ppt2png = function(input, output, callback) {
         callback(error);
         return;
       }
+      pdf2png(pdfPath+'.pdf', output, function(err){
+        fs.unlink(pdfPath+'.pdf', function(err) {
+          if(err) {
+            console.log(err);
+          }
+
+        });
+
+        callback(err);       
+      });
     });
   }
   else if(path.extname(input) == ".pdf"){
     var pdfPath = input.substr(0, input.lastIndexOf('.')) || input;
-  }  
-  
-  pdf2png(pdfPath+'.pdf', output, function(err){
-    fs.unlink(pdfPath+'.pdf', function(err) {
-      if(err) {
-        console.log(err);
-      }
 
+    pdf2png(pdfPath+'.pdf', output, function(err){
+      fs.unlink(pdfPath+'.pdf', function(err) {
+        if(err) {
+          console.log(err);
+        }
+
+      });
+
+      callback(err);       
     });
 
-    callback(err);       
-  });
-
+  }  
 }
 
 var pdf2png = function(input, output, callback) {
