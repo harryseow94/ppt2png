@@ -42,7 +42,7 @@ var ppt2png = function(input, output, callback) {
 }
 
 var pdf2png = function(input, output, callback) {
-  exec('convert -resize 1200x675 -background white -gravity center -extent 1200x675 -density 200 ' + input + ' ' + output+'.png', 
+  exec('convert -resize 1200x675 -alpha opaque -background black -gravity center -extent 1200x675 -density 200 ' + input + ' ' + output+'.png', 
     function (error, stdout, stderr) {
       if (error) {
         callback(error);
