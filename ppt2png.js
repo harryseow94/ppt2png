@@ -5,15 +5,14 @@ var exec = require('child_process').exec,
 
 var ppt2png = function(input, output, callback) {
   if(path.extname(input) == ".ppt" || path.extname(input) == ".pptx"){
-    var pdfPath = output;
-    exec('unoconv -f pdf -o ' + pdfPath + '.pdf ' + input, 
-    function( error, stdout, stderr) {
-      if (error) {
-        callback(error);
-        return;
-      }
-      pdf2png(pdfPath+'.pdf', output, function(err){
-        fs.unlink(pdfPath+'.pdf', function(err) {
+
+    exec('soffice --headless "macro:///ExpandAnimations.ExpandAnimations.Main()" ' + input);
+
+    var inputNoExt = input.substr(0, input.lastIndexOf('.')) || input;
+
+    setTimeout(function(){
+      pdf2png(inputNoExt+'-expanded.pdf', output, function(err){
+        fs.unlink(inputNoExt+'-expanded.pdf', function(err) {
           if(err) {
             console.log(err);
           }
@@ -22,7 +21,7 @@ var ppt2png = function(input, output, callback) {
 
         callback(err);       
       });
-    });
+    }, 40000);
   }
   else if(path.extname(input) == ".pdf"){
     var pdfPath = input.substr(0, input.lastIndexOf('.')) || input;
@@ -42,7 +41,7 @@ var ppt2png = function(input, output, callback) {
 }
 
 var pdf2png = function(input, output, callback) {
-  exec('convert -background white -alpha remove -resize 2000x1125 -background black -gravity center -extent 1200x675 ' + input + ' ' + output+'.png', 
+  exec('convert -background white -alpha remove -resize 1200x675 -background black -gravity center -extent 1200x675 -density 300 -quality 100 ' + input + ' ' + output+'.png', 
     function (error, stdout, stderr) {
       if (error) {
         callback(error);
