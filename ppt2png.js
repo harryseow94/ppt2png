@@ -10,18 +10,19 @@ var ppt2png = function(input, output, callback) {
 
     var inputNoExt = input.substr(0, input.lastIndexOf('.')) || input;
 
-    setTimeout(function(){
-      pdf2png(inputNoExt+'-expanded.pdf', output, function(err){
-        fs.unlink(inputNoExt+'-expanded.pdf', function(err) {
-          if(err) {
-            console.log(err);
-          }
-
+    var convertFile = setInterval(function(){
+      if (fs.existsSync(inputNoExt+'-expanded.pdf')){
+        pdf2png(inputNoExt+'-expanded.pdf', output, function(err){
+          fs.unlink(inputNoExt+'-expanded.pdf', function(err) {
+            if(err) {
+              console.log(err);
+            }
+          });
+          callback(err);
         });
-
-        callback(err);       
-      });
-    }, 40000);
+        clearInterval(convertFile);
+      }
+    }, 1000);
   }
   else if(path.extname(input) == ".pdf"){
     var pdfPath = input.substr(0, input.lastIndexOf('.')) || input;
@@ -31,9 +32,7 @@ var ppt2png = function(input, output, callback) {
         if(err) {
           console.log(err);
         }
-
       });
-
       callback(err);       
     });
 
@@ -41,7 +40,7 @@ var ppt2png = function(input, output, callback) {
 }
 
 var pdf2png = function(input, output, callback) {
-  exec('convert -background white -alpha remove -resize 1200x675 -background black -gravity center -extent 1200x675 -density 300 -quality 100 ' + input + ' ' + output+'.png', 
+  exec('convert -limit memory 256MiB -limit map 512MiB -background white -alpha remove -resize 1200x675 -background black -gravity center -extent 1200x675 -density 300 ' + input + ' ' + output+'.png', 
     function (error, stdout, stderr) {
       if (error) {
         callback(error);
