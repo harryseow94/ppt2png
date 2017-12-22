@@ -2,16 +2,16 @@ var exec = require('child_process').exec,
     fs = require('fs');
     path = require('path');
 
-
 var ppt2png = function(input, output, callback) {
   if(path.extname(input) == ".ppt" || path.extname(input) == ".pptx"){
 
-    exec('soffice --headless "macro:///ExpandAnimations.ExpandAnimations.Main()" ' + input);
-
     var inputNoExt = input.substr(0, input.lastIndexOf('.')) || input;
+
+    exec('soffice --headless "macro:///ExpandAnimations.ExpandAnimations.Main()" ' + input);
 
     var convertFile = setInterval(function(){
       if (fs.existsSync(inputNoExt+'-expanded.pdf')){
+        exec('pkill soffice.bin');
         pdf2png(inputNoExt+'-expanded.pdf', output, function(err){
           fs.unlink(inputNoExt+'-expanded.pdf', function(err) {
             if(err) {
