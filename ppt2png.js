@@ -11,6 +11,7 @@ var ppt2png = function(input, output, callback) {
 
     var convertFile = setInterval(function(){
       if (fs.existsSync(inputNoExt+'-expanded.pdf')){
+        exec('pkill libreoffice');
         exec('pkill soffice.bin');
         pdf2png(inputNoExt+'-expanded.pdf', output, function(err){
           fs.unlink(inputNoExt+'-expanded.pdf', function(err) {
